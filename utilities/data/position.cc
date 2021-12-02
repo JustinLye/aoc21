@@ -77,3 +77,30 @@ aoc::utilities::data::Position& aoc::utilities::data::Position::operator+=(const
     }
     return *this;
 }
+
+aoc::utilities::data::Orientation::Orientation(int a) :
+    Position(),
+    aim(a) {
+    horizontal = 0;
+    depth = 0;
+}
+
+aoc::utilities::data::Orientation& aoc::utilities::data::Orientation::operator+=(const PositionDelta& delta) {
+    switch (delta.direction) {
+    case direction::forward:
+        horizontal += delta.units;
+        depth += delta.units * aim;
+        break;
+    case direction::backward:
+        horizontal -= delta.units;
+        depth -= delta.units * aim;
+        break;
+    case direction::up:
+        aim -= delta.units;
+        break;
+    case direction::down:
+        aim += delta.units;
+        break;
+    }
+    return *this;
+}

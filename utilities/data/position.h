@@ -25,6 +25,13 @@ namespace utilities {
             int depth;
             Position& operator+=(const PositionDelta& delta);
         };
+
+        struct Orientation :
+            public Position {
+            int aim;
+            Orientation(int a = 0);
+            Orientation& operator+=(const PositionDelta& delta);
+        };
     }
 }}
 
