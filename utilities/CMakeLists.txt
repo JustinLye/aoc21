@@ -9,5 +9,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_library(utilities)
 target_sources(utilities PRIVATE ${CMAKE_SOURCE_DIR}/utilities/input/input.cc ${CMAKE_SOURCE_DIR}/utilities/input/input.h)
+target_sources(utilities PRIVATE ${CMAKE_SOURCE_DIR}/utilities/data/position.cc ${CMAKE_SOURCE_DIR}/utilities/data/position.h)
 target_include_directories(utilities PRIVATE ${CMAKE_SOURCE_DIR}/utilities)
 add_library(aoc_utils ALIAS utilities)
