@@ -8,5 +8,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_subdirectory(utilities)
+add_subdirectory(days)
 add_executable(aoc aoc.cc)
 target_link_libraries(aoc PUBLIC aoc_utils)
+target_link_libraries(aoc PUBLIC aoc_days)
