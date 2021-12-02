@@ -7,4 +7,6 @@ project(aoc VERSION 1.0)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(aoc d1.cc)
+add_subdirectory(utilities)
+add_executable(aoc aoc.cc)
+target_link_libraries(aoc PUBLIC aoc_utils)
