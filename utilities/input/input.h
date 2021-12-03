@@ -1,12 +1,14 @@
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <string>
 #include <vector>
+
+#include "input_stream.h"
 
 namespace aoc {
 namespace utilities {
     namespace input {
+        namespace detail {
+            void throw_nonexisting_file(const char* file_name);
+            void throw_corrupted_data(const char* file_name);
+        }
         template<class T>
         std::vector<T> read_file(const char* file_name);
     }
@@ -14,21 +16,15 @@ namespace utilities {
 
 template<class T>
 std::vector<T> aoc::utilities::input::read_file(const char* file_name) {
-    std::ifstream input_file;
-    input_file.open(file_name, std::ios::in);
-    if (!input_file.good()) {
-        std::stringstream ss;
-        ss << "Error! Failed to read file. \'" << file_name << "\' is not an existing file.";
-        throw std::runtime_error(ss.str().c_str());
+    InputStream<T> stream(file_name);
+    if (stream.fail()) {
+        detail::throw_nonexisting_file(file_name);
     }
     std::vector<T> file_content;
-    while (!input_file.eof()) {
-        T input;
-        input_file >> input;
-        if (!input_file.good() && !input_file.eof()) {
-            std::stringstream ss;
-            ss << "Error! Failed to read file. \'" << file_name << "\' contains corrupted data.";
-            throw std::runtime_error(ss.str().c_str());
+    while (stream.good()) {
+        auto input = stream.get();
+        if (stream.fail()) {
+            detail::throw_corrupted_data(file_name);
         }
         file_content.push_back(input);
     }
