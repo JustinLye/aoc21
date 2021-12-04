@@ -71,6 +71,7 @@ bool aoc::utilities::input::InputStream<T>::fail() const noexcept {
 template<class T>
 bool aoc::utilities::input::InputStream<T>::good() const noexcept {
     return m_Stream.good();
+}
 
 template<class T>
 std::size_t aoc::utilities::input::InputStream<T>::size() {
