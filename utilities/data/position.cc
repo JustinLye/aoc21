@@ -11,7 +11,7 @@ static std::string to_lower(const std::string& s) {
         s.begin(),
         s.end(),
         std::back_inserter(output),
-        [&](unsigned char c) -> int { return std::tolower(c); });
+        [&](unsigned char c) -> char { return static_cast<char>(std::tolower(static_cast<int>(c))); });
     return output;
 }
 

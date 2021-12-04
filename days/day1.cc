@@ -5,12 +5,12 @@
 
 #include "utilities/input/input.h"
 
-static int count_increases(const std::vector<int>& v, int window_size = 1) {
+static int count_increases(const std::vector<int>& v, std::size_t window_size = 1) {
     if (v.size() <= window_size) {
         return 0;
     }
     auto increases = 0;
-    for (auto i = window_size; i < v.size(); ++i) {
+    for (std::size_t i = window_size; i < v.size(); ++i) {
         if (v[i - window_size] < v[i]) {
             ++increases;
         }
