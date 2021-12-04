@@ -35,6 +35,9 @@ int calculate_power_generation(aoc::utilities::input::BitStream<N>& stream);
 template<std::size_t N>
 std::vector<int> generate_scoreboard(aoc::utilities::input::BitStream<N>& stream);
 
+
+template<std::size_t N>
+std::bitset<N> get_life_support_rating(int score, rating_t rating, const std::vector<std::bitset<N>>& ones, const std::vector<std::bitset<N>>& zeros);
 template<std::size_t N>
 std::pair<std::bitset<N>, std::bitset<N>> get_life_support_ratings(aoc::utilities::input::BitStream<N>& stream);
 template<std::size_t N>
@@ -87,56 +90,6 @@ template<std::size_t N>
 int calculate_life_support_rating(const std::pair<std::bitset<N>, std::bitset<N>>& ratings) {
     return static_cast<int>(ratings.first.to_ulong()) * static_cast<int>(ratings.second.to_ulong());
 }
-
-template<std::size_t N>
-std::pair<std::bitset<N>, std::bitset<N>> get_life_support_ratings(aoc::utilities::input::BitStream<N>& stream) {
-    using namespace aoc::utilities::messages;
-    std::vector<std::bitset<N>> ones;
-    std::vector<std::bitset<N>> zeros;
-    int score = 0;
-    auto offset = N - 1U; // Assume BIT_WIDTH is > 0.
-    while (stream.good()) {
-        auto bit_set = stream.get();
-        if (stream.fail()) {
-            errors::throw_corrupt_data(INPUT_FILE_PATH);
-        }
-        if (bit_set[offset]) {
-            ones.push_back(bit_set);
-            ++score;
-        } else {
-            zeros.push_back(bit_set);
-            --score;
-        }
-    }
-#if defined(_DEBUG)
-    std::stringstream ss;
-    ss << "\'" << ones.size() + zeros.size() << "\' bitsets to process.";
-    std::cout << ss.str() << std::endl;
-#endif
-    return get_life_support_ratings<N>(score, ones, zeros);
-}
-
-template<>
-std::pair<std::bitset<1>, std::bitset<1>> get_life_support_ratings(int score, const std::vector<std::bitset<1>>& ones, const std::vector<std::bitset<1>>& zeros) {
-    // Avoid potential infinite loop by returning early.
-    auto oxygen_generator_bit_set = get_most_common_bit(score, rating_t::oxygen_generator_rating) ? ones : zeros;
-    auto C02_scrubber_bit_set = get_most_common_bit(score, rating_t::CO2_scrubber_rating) ? ones : zeros;
-
-    if (oxygen_generator_bit_set.size() == 1 && C02_scrubber_bit_set.size() == 1) {
-        return { oxygen_generator_bit_set[0], C02_scrubber_bit_set[0] };
-    }
-
-    throw std::runtime_error("Error! Could not calculate life support rating because input contains corrupt data.");
-}
-
-template<std::size_t N>
-std::pair<std::bitset<N>, std::bitset<N>> get_life_support_ratings(int score, const std::vector<std::bitset<N>>& ones, const std::vector<std::bitset<N>>& zeros) {
-    constexpr auto offset = N - 1U;
-    auto oxygen_generator_rating = get_most_common_bit(score, rating_t::oxygen_generator_rating) ? calculate_life_support_rating(ones, rating_t::oxygen_generator_rating, offset - 1) : calculate_life_support_rating(zeros, rating_t::oxygen_generator_rating, offset - 1);
-    auto C02_scrubber_rating = get_most_common_bit(score, rating_t::CO2_scrubber_rating) ? calculate_life_support_rating(ones, rating_t::CO2_scrubber_rating, offset - 1) : calculate_life_support_rating(zeros, rating_t::CO2_scrubber_rating, offset - 1);
-    return { oxygen_generator_rating, C02_scrubber_rating };
-}
-
 
 template<std::size_t N>
 std::bitset<N> calculate_life_support_rating(const std::vector<std::bitset<N>>& bits, rating_t rating, std::size_t offset) {
@@ -224,6 +177,60 @@ std::vector<int> generate_scoreboard(aoc::utilities::input::BitStream<N>& stream
         score(bits, scoreboard);
     }
     return scoreboard;
+}
+
+template<std::size_t N>
+std::bitset<N> get_life_support_rating(int score, rating_t rating, const std::vector<std::bitset<N>>& ones, const std::vector<std::bitset<N>>& zeros) {
+    constexpr auto offset = N - 2U;
+    return get_most_common_bit(score, rating) ? calculate_life_support_rating(ones, rating, offset) : calculate_life_support_rating(zeros, rating, offset);
+}
+
+template<std::size_t N>
+std::pair<std::bitset<N>, std::bitset<N>> get_life_support_ratings(aoc::utilities::input::BitStream<N>& stream) {
+    using namespace aoc::utilities::messages;
+    std::vector<std::bitset<N>> ones;
+    std::vector<std::bitset<N>> zeros;
+    int score = 0;
+    auto offset = N - 1U; // Assume BIT_WIDTH is > 0.
+    while (stream.good()) {
+        auto bit_set = stream.get();
+        if (stream.fail()) {
+            errors::throw_corrupt_data(INPUT_FILE_PATH);
+        }
+        if (bit_set[offset]) {
+            ones.push_back(bit_set);
+            ++score;
+        } else {
+            zeros.push_back(bit_set);
+            --score;
+        }
+    }
+#if defined(_DEBUG)
+    std::stringstream ss;
+    ss << "\'" << ones.size() + zeros.size() << "\' bitsets to process.";
+    std::cout << ss.str() << std::endl;
+#endif
+    return get_life_support_ratings<N>(score, ones, zeros);
+}
+
+template<>
+std::pair<std::bitset<1>, std::bitset<1>> get_life_support_ratings(int score, const std::vector<std::bitset<1>>& ones, const std::vector<std::bitset<1>>& zeros) {
+    // Avoid potential infinite loop by returning early.
+    auto oxygen_generator_bit_set = get_most_common_bit(score, rating_t::oxygen_generator_rating) ? ones : zeros;
+    auto C02_scrubber_bit_set = get_most_common_bit(score, rating_t::CO2_scrubber_rating) ? ones : zeros;
+
+    if (oxygen_generator_bit_set.size() == 1 && C02_scrubber_bit_set.size() == 1) {
+        return { oxygen_generator_bit_set[0], C02_scrubber_bit_set[0] };
+    }
+
+    throw std::runtime_error("Error! Could not calculate life support rating because input contains corrupt data.");
+}
+
+template<std::size_t N>
+std::pair<std::bitset<N>, std::bitset<N>> get_life_support_ratings(int score, const std::vector<std::bitset<N>>& ones, const std::vector<std::bitset<N>>& zeros) {
+    auto oxygen_generator_rating = get_life_support_rating(score, rating_t::oxygen_generator_rating, ones, zeros);
+    auto C02_scrubber_rating = get_life_support_rating(score, rating_t::CO2_scrubber_rating, ones, zeros);
+    return { oxygen_generator_rating, C02_scrubber_rating };
 }
 
 bool get_most_common_bit(int score, rating_t rating) {
