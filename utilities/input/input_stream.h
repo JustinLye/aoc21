@@ -21,6 +21,7 @@ namespace utilities {
             
             bool fail() const noexcept;
             bool good() const noexcept;
+            std::size_t size();
             
             virtual T get();
             void reset();
@@ -70,6 +71,17 @@ bool aoc::utilities::input::InputStream<T>::fail() const noexcept {
 template<class T>
 bool aoc::utilities::input::InputStream<T>::good() const noexcept {
     return m_Stream.good();
+
+template<class T>
+std::size_t aoc::utilities::input::InputStream<T>::size() {
+    if (!good()) {
+        throw std::runtime_error("Error! size failed because input stream is not available.");
+    }
+    auto current_pos = m_Stream.tellg();
+    m_Stream.seekg(0, std::ios_base::end);
+    auto buffer_size = m_Stream.tellg();
+    m_Stream.seekg(current_pos);
+    return buffer_size;
 }
 
 template<class T>
