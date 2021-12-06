@@ -1,7 +1,9 @@
 #include "day3.h"
 
 #include <bitset>
+#include <future>
 #include <iostream>
+#include <thread>
 #include <vector>
 
 #include "utilities/messages/errors.h"
@@ -228,6 +230,11 @@ std::pair<std::bitset<1>, std::bitset<1>> get_life_support_ratings(int score, co
 
 template<std::size_t N>
 std::pair<std::bitset<N>, std::bitset<N>> get_life_support_ratings(int score, const std::vector<std::bitset<N>>& ones, const std::vector<std::bitset<N>>& zeros) {
+    if ((ones.size() + zeros.size()) > 2000) {
+        auto oxygen_rating_future = std::async(std::launch::async, [&] { return get_life_support_rating(score, rating_t::oxygen_generator_rating, ones, zeros); });
+        auto co2_rating_future = std::async(std::launch::async, [&] { return get_life_support_rating(score, rating_t::CO2_scrubber_rating, ones, zeros); });
+        return { oxygen_rating_future.get(), co2_rating_future.get() };
+    }
     auto oxygen_generator_rating = get_life_support_rating(score, rating_t::oxygen_generator_rating, ones, zeros);
     auto C02_scrubber_rating = get_life_support_rating(score, rating_t::CO2_scrubber_rating, ones, zeros);
     return { oxygen_generator_rating, C02_scrubber_rating };
