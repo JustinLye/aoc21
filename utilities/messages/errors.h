@@ -1,3 +1,5 @@
+#pragma once
+
 namespace aoc {
 namespace utilities {
     namespace messages {

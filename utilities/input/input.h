@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 
 #include "input_stream.h"

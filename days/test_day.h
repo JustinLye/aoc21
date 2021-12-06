@@ -1,3 +1,5 @@
+#pragma once
+
 namespace aoc {
     namespace days {
         struct test_day {
